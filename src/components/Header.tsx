@@ -1,11 +1,24 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import ProcureNomeText from "../fragments/ProcureNomeText";
 import EncontreRepositoriosText from "../fragments/EncontreRepositoriosText";
 
 import { useLocation, useNavigate } from "react-router-dom";
+import SearchStatus from "../types/SearchStatus";
 
-const Header = () => {
+interface HeaderProps {
+  searchText: string;
+  setSearchText: React.Dispatch<React.SetStateAction<string>>;
+  searchLoadingStatus: SearchStatus;
+  setSearchLoadingStatus: React.Dispatch<React.SetStateAction<SearchStatus>>;
+}
+
+const Header: React.FC<HeaderProps> = ({
+  searchText,
+  setSearchText,
+  searchLoadingStatus,
+  setSearchLoadingStatus,
+}) => {
   const [showText, setShowText] = useState(true);
 
   const currentLocation = useLocation();
@@ -13,8 +26,21 @@ const Header = () => {
   const navigate = useNavigate();
 
   const handleSearch = () => {
-    setShowText((value) => !value);
+    if (searchText === "") return;
+
+    setSearchLoadingStatus("loading");
   };
+
+  useEffect(() => {
+    if (searchLoadingStatus === "notFound" || searchLoadingStatus === "found") {
+      setShowText(false);
+      return;
+    }
+
+    if (searchLoadingStatus === "initial") {
+      setShowText(true);
+    }
+  }, [searchLoadingStatus]);
 
   const handleFavorites = () => {
     navigate(
@@ -23,7 +49,7 @@ const Header = () => {
   };
 
   return (
-    <header className="pt-8 px-[1.3rem] desktop:pt-0 desktop:pr-0">
+    <header className="pt-8 pb-0 px-[1.3rem] desktop:pt-0 desktop:pr-0 desktop:border-b desktop:border-border-and-line">
       <div
         className={`desktop:p-0 pb-2 desktop:hidden ${
           showText ? "" : "hidden"
@@ -50,9 +76,14 @@ const Header = () => {
               bg-white-background-light
               text-grey-dark placeholder-placeholder 
               max-w-[220px]
-              text-
+              desktop:max-w-[600px]
+              desktop:w-[600px]
               focus:border-transparent focus:outline-none
               "
+            value={searchText}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+              setSearchText(event.target.value)
+            }
           />
           <img src="./lupa.svg" className="w-4" onClick={handleSearch} />
         </div>
