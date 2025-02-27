@@ -5,61 +5,104 @@ import EncontreRepositoriosText from "../fragments/EncontreRepositoriosText";
 
 import { useLocation, useNavigate } from "react-router-dom";
 import SearchStatus from "../types/SearchStatus";
+import { usePaginateGHProfileRepos } from "../hooks/useGitHubRepos";
 
 interface HeaderProps {
-  searchText: string;
-  setSearchText: React.Dispatch<React.SetStateAction<string>>;
-  searchLoadingStatus: SearchStatus;
-  setSearchLoadingStatus: React.Dispatch<React.SetStateAction<SearchStatus>>;
+  searchLoadingStatusProp: SearchStatus;
+  setSearchLoadingStatusProp: React.Dispatch<
+    React.SetStateAction<SearchStatus>
+  >;
 }
 
 const Header: React.FC<HeaderProps> = ({
-  searchText,
-  setSearchText,
-  searchLoadingStatus,
-  setSearchLoadingStatus,
+  searchLoadingStatusProp,
+  setSearchLoadingStatusProp,
 }) => {
-  const [showText, setShowText] = useState(true);
+  const {
+    username,
+    setUsername,
+    user,
+    loadingSearch,
+    error,
+    fetchGithubData,
+    hasMore,
+  } = usePaginateGHProfileRepos();
 
+  const [showInstructionText, setShowInstructionText] = useState(true);
   const currentLocation = useLocation();
 
   const navigate = useNavigate();
+  const searchLoadingStatusTrue = searchLoadingStatusProp === "loading";
+  const isFavoritePage = String(currentLocation.pathname) === "/favorites";
 
   const handleSearch = () => {
-    if (searchText === "") return;
+    if (
+      username === "" ||
+      searchLoadingStatusTrue ||
+      isFavoritePage ||
+      (user?.login.toLowerCase() === username.toLowerCase() && !hasMore)
+    )
+      return;
 
-    setSearchLoadingStatus("loading");
+    setSearchLoadingStatusProp("loading");
   };
 
   useEffect(() => {
-    if (searchLoadingStatus === "notFound" || searchLoadingStatus === "found") {
-      setShowText(false);
+    if (
+      searchLoadingStatusProp === "errorNotFoundUser" ||
+      searchLoadingStatusProp === "found"
+    ) {
+      setShowInstructionText(false);
       return;
     }
 
-    if (searchLoadingStatus === "initial") {
-      setShowText(true);
+    if (searchLoadingStatusProp === "initial") {
+      setShowInstructionText(true);
     }
-  }, [searchLoadingStatus]);
+
+    if (searchLoadingStatusProp === "loading") {
+      if (user?.login.toLowerCase() !== username.toLowerCase()) {
+        fetchGithubData(true);
+      } else {
+        fetchGithubData();
+      }
+    }
+  }, [searchLoadingStatusProp]);
+
+  useEffect(() => {
+    if (username === "") setSearchLoadingStatusProp("initial");
+  }, [username]);
+
+  useEffect(() => {
+    if (searchLoadingStatusTrue && !loadingSearch) {
+      if (error) {
+        const errorType = error.toLowerCase().includes("usuário")
+          ? "errorNotFoundUser"
+          : "errorNotFoundRepo";
+
+        setSearchLoadingStatusProp(errorType);
+      } else {
+        setSearchLoadingStatusProp("found");
+      }
+    }
+  }, [loadingSearch]);
 
   const handleFavorites = () => {
-    navigate(
-      String(currentLocation.pathname) === "/favorites" ? "/" : "/favorites"
-    );
+    navigate(isFavoritePage ? "/" : "/favorites");
   };
 
   return (
     <header className="pt-8 pb-0 px-[1.3rem] desktop:pt-0 desktop:pr-0 desktop:border-b desktop:border-border-and-line">
       <div
         className={`desktop:p-0 pb-2 desktop:hidden ${
-          showText ? "" : "hidden"
+          showInstructionText ? "" : "hidden"
         }`}
       >
         <ProcureNomeText />
       </div>
       <div
         className={`pb-6 desktop:p-0 desktop:hidden ${
-          showText ? "" : "hidden"
+          showInstructionText ? "" : "hidden"
         }`}
       >
         <EncontreRepositoriosText />
@@ -80,17 +123,26 @@ const Header: React.FC<HeaderProps> = ({
               desktop:w-[600px]
               focus:border-transparent focus:outline-none
               "
-            value={searchText}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-              setSearchText(event.target.value)
-            }
+            value={username}
+            onInput={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setUsername(event.target.value);
+            }}
           />
-          <img src="./lupa.svg" className="w-4" onClick={handleSearch} />
+          <img
+            src={`${searchLoadingStatusTrue ? "./loading.gif" : "./lupa.svg"}`}
+            className={`w-4 ${searchLoadingStatusTrue ? "h-4 mt-3" : ""}`}
+            onClick={handleSearch}
+          />
         </div>
         <div
-          className="bg-primary hidden h-20 w-[145px]
+          className={`bg-primary hidden h-20 w-[145px]
           desktop:flex row items-center justify-center gap-2
-          "
+        ${
+          isFavoritePage
+            ? "aria-selected:bg-primary-dark aria-selected:shadow-lg"
+            : ""
+        }`}
+          aria-selected={isFavoritePage}
           onClick={handleFavorites}
         >
           <img

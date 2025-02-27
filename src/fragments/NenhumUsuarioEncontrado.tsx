@@ -1,12 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 
 interface NenhumUsuarioEncontradoProps {
-  searchText: string;
+  usernameSearch: string;
 }
 
 const NenhumUsuarioEncontrado: React.FC<NenhumUsuarioEncontradoProps> = ({
-  searchText,
+  usernameSearch,
 }) => {
+
+  const [username] = useState(usernameSearch)
   return (
     <>
       <div className="text-center pt-3 desktop:hidden">
@@ -14,7 +16,7 @@ const NenhumUsuarioEncontrado: React.FC<NenhumUsuarioEncontradoProps> = ({
           className="font-poppins text-heading-4
           text-primary font-semibold "
         >
-          "{searchText}"
+          "{username}"
         </h4>
 
         <h4
@@ -39,7 +41,7 @@ const NenhumUsuarioEncontrado: React.FC<NenhumUsuarioEncontradoProps> = ({
           className="font-poppins text-heading-1
           text-primary font-semibold hidden desktop:block"
         >
-          "{searchText}"
+          "{username}"
         </h4>
         <h4
           className="font-poppins text-heading-1

@@ -1,3 +1,8 @@
-type SearchStatus = "initial" | "loading" | "notFound" | "found";
+type SearchStatus =
+    "initial"
+    | "loading"
+    | "errorNotFoundUser"
+    | "errorNotFoundRepo"
+    | "found";
 
 export default SearchStatus
