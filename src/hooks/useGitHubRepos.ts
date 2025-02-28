@@ -41,18 +41,7 @@ export function usePaginateGHProfileRepos() {
     try {
       const currentPage = reset ? 1 : page;
 
-      console.log(
-        "currentPage-> ",
-        currentPage,
-        " - reset-> ",
-        reset,
-        " - page-> ",
-        page
-      );
-
-      if (reset) {
-        resetSearch();
-      }
+      if (reset) resetSearch();
 
       // Search User
       const userResponse = await fetch(
@@ -105,11 +94,11 @@ export function usePaginateGHProfileRepos() {
           name: userData.name ?? "",
           login: userData.login ?? "",
           bio: userData.bio ?? "",
+          avatar_url: userData.avatar_url ?? "",
           repositories: updateRepositories,
         };
       });
 
-      // setPage(currentPage + 1);
       setPage((value) => value + 1);
       setHasMore(reposData.length > 0);
     } catch (localError) {

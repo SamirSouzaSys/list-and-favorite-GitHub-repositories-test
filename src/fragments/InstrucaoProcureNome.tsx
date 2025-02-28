@@ -7,12 +7,12 @@ const InstrucaoProcureNome = () => {
         className="hidden 
         text-center desktop:grid justify-center desktop:pt-[7rem]"
       >
-        <h4
+        <h1
           className="font-poppins text-heading-1
         text-grey-neutral font-semibold"
         >
           Procure pelo Nome ou Nome de Usuário
-        </h4>
+        </h1>
         <p
           className="font-poppins font-regular text-heading-5
         text-grey-neutral"
