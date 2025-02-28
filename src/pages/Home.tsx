@@ -6,6 +6,7 @@ import InstrucaoProcureNome from "../fragments/InstrucaoProcureNome";
 import { usePaginateGHProfileRepos } from "../hooks/useGitHubRepos";
 import SearchStatus from "../types/SearchStatus";
 import NenhumUsuarioEncontrado from "../fragments/NenhumUsuarioEncontrado";
+import User from "../components/User";
 
 interface HomeProps {
   searchLoadingStatus: searchStatus;
@@ -63,17 +64,21 @@ const Home: React.FC<HomeProps> = ({ searchLoadingStatus }) => {
       {searchLoadingStatus === "errorNotFoundRepo" && (
         <p>Nenhum repo encontrado</p>
       )}
-      <br />
-      <br />
+      {searchLoadingStatus === "found" && (
+        <User
+          avatar_url={user?.avatar_url}
+          name={user?.name ?? ""}
+          login={user?.login ?? ""}
+          bio={user?.bio ?? ""}
+        />
+      )}
+
       <br />
 
       {searchLoadingStatus === "found" && (
         <>
           <div>
-            <strong>
-              {user?.name} ({user?.login})
-            </strong>
-            <p>{user?.bio}</p>
+
             <hr />
             <br />
 

@@ -110,7 +110,8 @@ const Header: React.FC<HeaderProps> = ({
       <div className="desktop:flex desktop:row desktop:justify-between desktop:items-center">
         <div
           className="flex justify-between border-border-and-line
-              border-[1px] rounded pl-4 pr-4 h-10 desktop:w-[41.75rem] border-solid
+              border-[1px]  border-solid rounded
+              pl-4 pr-4 h-10 desktop:w-[41.75rem]
           "
         >
           <input
