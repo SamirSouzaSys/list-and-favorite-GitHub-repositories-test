@@ -1,10 +1,12 @@
-import RepoLanguages from "./RepoLanguages";
+import RepositoryLanguages from "./RepositoryLanguages";
 
 type Repository = {
+  id: number;
   name: string;
-  description: string | null;
-  languages: RepoLanguages;
+  description: string | undefined;
+  languages: RepositoryLanguages | undefined;
   updated_at: string;
+  isFavorite: boolean;
 };
 
 export default Repository;

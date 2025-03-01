@@ -1,6 +1,6 @@
-import React, { useCallback, useState } from "react";
+import React, { useState } from "react";
 
-import RepoLanguages from "../types/RepoLanguages";
+import RepositoryLanguages from "../types/RepositoryLanguages";
 import Repository from "../types/Repository";
 import { useGithubUser } from "../context/GithubUser";
 import GithubUser from "../types/GithubUser";
@@ -73,13 +73,17 @@ export function usePaginateGHProfileRepos() {
             }/languages`,
             headerModel
           );
-          const languagesData: RepoLanguages = await languagesResponse.json();
+          const languagesData: RepositoryLanguages =
+            await languagesResponse.json();
 
           return {
+            // TODO Verificar no localstorage
+            isFavorite: false,
             name: repo.name,
             description: repo.description,
             languages: languagesData,
             updated_at: repo.updated_at,
+            id: repo.id,
           } as Repository;
         })
       );
@@ -127,6 +131,7 @@ export function usePaginateGHProfileRepos() {
     username,
     setUsername,
     user,
+    setUser,
     loadingSearch,
     error,
     fetchGithubData,

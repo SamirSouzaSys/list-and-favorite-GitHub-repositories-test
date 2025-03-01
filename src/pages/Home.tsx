@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import searchStatus from "../types/SearchStatus";
 
 import InstrucaoProcureNome from "../fragments/InstrucaoProcureNome";
@@ -7,6 +7,7 @@ import { usePaginateGHProfileRepos } from "../hooks/useGitHubRepos";
 import SearchStatus from "../types/SearchStatus";
 import NenhumUsuarioEncontrado from "../fragments/NenhumUsuarioEncontrado";
 import User from "../components/User";
+import RepositoryComponent from "../components/Repository";
 
 interface HomeProps {
   searchLoadingStatus: searchStatus;
@@ -14,8 +15,15 @@ interface HomeProps {
 }
 
 const Home: React.FC<HomeProps> = ({ searchLoadingStatus }) => {
-  const { username, user, loadingSearch, hasMore, loadMore, fetchGithubData } =
-    usePaginateGHProfileRepos();
+  const {
+    username,
+    user,
+    setUser,
+    loadingSearch,
+    hasMore,
+    loadMore,
+    fetchGithubData,
+  } = usePaginateGHProfileRepos();
 
   const observer = useRef<IntersectionObserver | null>(null);
   const lastRepoRef = useRef<HTMLDivElement | null>(null);
@@ -53,6 +61,31 @@ const Home: React.FC<HomeProps> = ({ searchLoadingStatus }) => {
     };
   }, [hasMore, loadingSearch, loadMore, searchLoadingStatus]);
 
+  const toggleFavorite = useCallback(
+    (repoId: number) => {
+      setUser((prevUser) => {
+        if (!prevUser) return prevUser;
+
+        return {
+          ...prevUser,
+          repositories: prevUser.repositories.map((repo) =>
+            repo.id === repoId
+              ? { ...repo, isFavorite: !repo.isFavorite }
+              : repo
+          ),
+        };
+      });
+    },
+    [setUser]
+  );
+
+  const handleIsFavorite = useCallback(
+    (repoId: number) => {
+      toggleFavorite(repoId);
+    },
+    [toggleFavorite]
+  );
+
   return (
     <>
       {searchLoadingStatus === "initial" && <InstrucaoProcureNome />}
@@ -64,27 +97,55 @@ const Home: React.FC<HomeProps> = ({ searchLoadingStatus }) => {
       {searchLoadingStatus === "errorNotFoundRepo" && (
         <p>Nenhum repo encontrado</p>
       )}
-      {searchLoadingStatus === "found" && (
-        <User
-          avatar_url={user?.avatar_url}
-          name={user?.name ?? ""}
-          login={user?.login ?? ""}
-          bio={user?.bio ?? ""}
-        />
-      )}
 
-      <br />
+      <div className="flex flex-col desktop:flex-row">
+        <div className="mb-4 desktop:mr-12">
+          {searchLoadingStatus === "found" && (
+            <User
+              avatar_url={user?.avatar_url}
+              name={user?.name ?? ""}
+              login={user?.login ?? ""}
+              bio={user?.bio ?? ""}
+            />
+          )}
+        </div>
+        <div>
+          {searchLoadingStatus === "found" && (
+            <>
+              {/* {console.dir(user)} */}
+              <h1 className="font-poppins font-semibold text-heading-1 text-primary mb-4">
+                Repositórios
+              </h1>
+              {user?.repositories.map((repo) => {
+                return (
+                  <RepositoryComponent
+                    key={repo.id}
+                    id={repo.id}
+                    name={repo.name}
+                    description={repo.description}
+                    languages={repo.languages}
+                    updated_at={repo.updated_at}
+                    isFavorite={repo.isFavorite ?? false}
+                    setIsFavorite={() => handleIsFavorite(repo.id)}
+                  />
+                );
+              })}
+              {!hasMore &&
+                "Todos os repositórios públicos já foram carregados."}
+              <div ref={lastRepoRef} className="h-20" />
+            </>
+          )}
+        </div>
+      </div>
 
-      {searchLoadingStatus === "found" && (
+      {/* // {searchLoadingStatus === "found" && ( */}
+      {/* // )} */}
+
+      {/* {searchLoadingStatus === "found" && (
         <>
           <div>
 
-            <hr />
-            <br />
-
-            <strong>Repositórios:</strong>
-            <br />
-
+            
             <ol>
               {Array.isArray(user?.repositories) &&
               user?.repositories.length > 0 ? (
@@ -119,7 +180,7 @@ const Home: React.FC<HomeProps> = ({ searchLoadingStatus }) => {
           {!hasMore && "Todos os repositórios públicos já foram carregados."}
           <div ref={lastRepoRef} className="h-20" />
         </>
-      )}
+      )} */}
       {isModalOpen && (
         <div
           className={`fixed inset-0 bg-black bg-opacity-50
