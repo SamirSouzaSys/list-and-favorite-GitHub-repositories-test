@@ -8,6 +8,10 @@ import SearchStatus from "../types/SearchStatus";
 import NenhumUsuarioEncontrado from "../fragments/NenhumUsuarioEncontrado";
 import User from "../components/User";
 import RepositoryComponent from "../components/Repository";
+import {
+  getFavoritesFromLocalStorage,
+  toggleFavoriteInLocalStorage,
+} from "../utils/FavoritesLocalStorage";
 
 interface HomeProps {
   searchLoadingStatus: searchStatus;
@@ -28,7 +32,13 @@ const Home: React.FC<HomeProps> = ({ searchLoadingStatus }) => {
   const observer = useRef<IntersectionObserver | null>(null);
   const lastRepoRef = useRef<HTMLDivElement | null>(null);
 
+  const [favorites, setFavorites] = useState<number[]>([]);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    setFavorites(getFavoritesFromLocalStorage().map((repo) => repo.id));
+  }, [user]);
 
   useEffect(() => {
     if (loadingSearch || searchLoadingStatus === "loading") {
@@ -61,29 +71,26 @@ const Home: React.FC<HomeProps> = ({ searchLoadingStatus }) => {
     };
   }, [hasMore, loadingSearch, loadMore, searchLoadingStatus]);
 
-  const toggleFavorite = useCallback(
+  const handleIsFavorite = useCallback(
     (repoId: number) => {
+      const repoItem = user?.repositories.find((item) => item.id === repoId);
+      if (!repoItem) return;
+
+      toggleFavoriteInLocalStorage(repoItem);
+
       setUser((prevUser) => {
         if (!prevUser) return prevUser;
-
         return {
           ...prevUser,
           repositories: prevUser.repositories.map((repo) =>
             repo.id === repoId
-              ? { ...repo, isFavorite: !repo.isFavorite }
+              ? { ...repo, IsFavorite: !repo.isFavorite }
               : repo
           ),
         };
       });
     },
-    [setUser]
-  );
-
-  const handleIsFavorite = useCallback(
-    (repoId: number) => {
-      toggleFavorite(repoId);
-    },
-    [toggleFavorite]
+    [setUser, user?.repositories]
   );
 
   return (
@@ -112,11 +119,15 @@ const Home: React.FC<HomeProps> = ({ searchLoadingStatus }) => {
         <div>
           {searchLoadingStatus === "found" && (
             <>
-              {/* {console.dir(user)} */}
               <h1 className="font-poppins font-semibold text-heading-1 text-primary mb-4">
                 Repositórios
               </h1>
               {user?.repositories.map((repo) => {
+                const favorites = getFavoritesFromLocalStorage();
+                const isFavorite = favorites.some(
+                  (favorite) => favorite.id === repo.id
+                );
+
                 return (
                   <RepositoryComponent
                     key={repo.id}
@@ -125,7 +136,7 @@ const Home: React.FC<HomeProps> = ({ searchLoadingStatus }) => {
                     description={repo.description}
                     languages={repo.languages}
                     updated_at={repo.updated_at}
-                    isFavorite={repo.isFavorite ?? false}
+                    isFavorite={isFavorite}
                     setIsFavorite={() => handleIsFavorite(repo.id)}
                   />
                 );
@@ -138,49 +149,6 @@ const Home: React.FC<HomeProps> = ({ searchLoadingStatus }) => {
         </div>
       </div>
 
-      {/* // {searchLoadingStatus === "found" && ( */}
-      {/* // )} */}
-
-      {/* {searchLoadingStatus === "found" && (
-        <>
-          <div>
-
-            
-            <ol>
-              {Array.isArray(user?.repositories) &&
-              user?.repositories.length > 0 ? (
-                user.repositories.map((repo, repoIndex) => (
-                  <li key={`${repo.name}-${repoIndex}`}>
-                    ---- <strong>{repo.name}</strong>
-                    <p>{repo.description}</p>
-                    <p>
-                      Última atualização:{" "}
-                      {new Date(repo.updated_at).toLocaleDateString()}
-                    </p>
-                    <br />
-                    <p>
-                      <strong>Languages</strong>
-                    </p>
-                    <ol>
-                      {Object.entries(repo.languages).map(
-                        ([language, langIndex]) => (
-                          <li key={`${language}-${langIndex}`}>{language}</li>
-                        )
-                      )}
-                    </ol>
-                    <br />
-                    <hr />
-                  </li>
-                ))
-              ) : (
-                <li>Nenhum repositório encontrado</li>
-              )}
-            </ol>
-          </div>
-          {!hasMore && "Todos os repositórios públicos já foram carregados."}
-          <div ref={lastRepoRef} className="h-20" />
-        </>
-      )} */}
       {isModalOpen && (
         <div
           className={`fixed inset-0 bg-black bg-opacity-50

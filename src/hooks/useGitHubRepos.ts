@@ -14,9 +14,6 @@ const headerModel = {
 };
 
 export function usePaginateGHProfileRepos() {
-  // const [username, setUsername] = useState<string>("");
-  // const [page, setPage] = useState<number>(1);
-  // const [hasMore, setHasMore] = useState<boolean>(true);
 
   const {
     user,
@@ -77,8 +74,6 @@ export function usePaginateGHProfileRepos() {
             await languagesResponse.json();
 
           return {
-            // TODO Verificar no localstorage
-            isFavorite: false,
             name: repo.name,
             description: repo.description,
             languages: languagesData,
