@@ -134,7 +134,7 @@ const Home: React.FC<HomeProps> = ({ searchLoadingStatus }) => {
                     id={repo.id}
                     name={repo.name}
                     description={repo.description}
-                    languages={repo.languages}
+                    languages={repo.languages || {}}
                     updated_at={repo.updated_at}
                     isFavorite={isFavorite}
                     setIsFavorite={() => handleIsFavorite(repo.id)}

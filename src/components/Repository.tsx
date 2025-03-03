@@ -1,14 +1,17 @@
-import { memo } from "react";
+import { memo, useEffect, useState } from "react";
 import IsFavorite from "../fragments/IsFavorite";
 import Repository from "../types/Repository";
 import { formatDate } from "../utils/date";
+import { verifyLanguageColorInLocalStorage } from "../utils/LanguagesLocalStorage";
+import RepositoryLanguages from "../types/RepositoryLanguages";
+import LanguageColor from "../types/LanguageColor";
 
 type RepositoryLocalProps = Pick<
   Repository,
-  "id" | "name" | "description" | "languages" | "updated_at"
+  "id" | "name" | "description" | "updated_at"
 > & {
   setIsFavorite: (id: number) => void;
-} & { isFavorite?: boolean };
+} & { isFavorite?: boolean } & { languages: RepositoryLanguages };
 
 const RepositoryComponent: React.FC<RepositoryLocalProps> = memo(
   ({
@@ -17,9 +20,20 @@ const RepositoryComponent: React.FC<RepositoryLocalProps> = memo(
     description,
     updated_at,
     isFavorite = false,
-    //   languages,
+    languages,
     setIsFavorite,
   }) => {
+    const [languagesColors, setLanguagesColors] = useState<LanguageColor[]>([]);
+
+    useEffect(() => {
+      const onlyLanguageArray = Object.keys(languages).map((language) => ({
+        name: language,
+        color: verifyLanguageColorInLocalStorage(language),
+      }));
+
+      setLanguagesColors(onlyLanguageArray);
+    }, []);
+
     return (
       <div
         className="border-border-and-line border-[1px] border-solid rounded-lg 
@@ -46,16 +60,17 @@ const RepositoryComponent: React.FC<RepositoryLocalProps> = memo(
             {description}
           </p>
         </div>
-        <div className="mb-1">
-          <div>
-            {/* {languages &&
-            Object.entries(languages).map((item) => {
-              item;
-            })} */}
-
-            {/* {Object.entries(repo.languages).map(([language, langIndex]) => (
-            <li key={`${language}-${langIndex}`}>{language}</li>
-          ))} */}
+        <div>
+          <div className="flex flex-row flex-wrap gap-x-3 mb-2">
+            {languagesColors.map(({ name, color }, index) => (
+              <div key={`${name} - ${index}`} className="flex flex-row items-center">
+                <div
+                  style={{ backgroundColor: color }}
+                  className="rounded-full w-4 h-4 mr-2"
+                ></div>
+                <div className="font-poppins text-paragraph-sm text-grey-neutral ">{name}</div>
+              </div>
+            ))}
           </div>
           <div>
             <p className="font-poppins text-paragraph-sm text-grey-neutral ">
