@@ -29,7 +29,7 @@ export function usePaginateGHProfileRepos() {
   const [loadingSearch, setLoadingSearch] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchGithubData = async (reset = false) => {
+  const fetchGithubData = async (username = user?.login, reset = false, ) => {
     if (username && !username.trim()) return;
 
     setLoadingSearch(true);

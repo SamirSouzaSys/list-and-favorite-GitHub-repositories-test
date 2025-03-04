@@ -62,7 +62,7 @@ const Header: React.FC<HeaderProps> = ({
 
     if (searchLoadingStatusProp === "loading") {
       if (user?.login.toLowerCase() !== username.toLowerCase()) {
-        fetchGithubData(true);
+        fetchGithubData(username, true);
       } else {
         fetchGithubData();
       }
