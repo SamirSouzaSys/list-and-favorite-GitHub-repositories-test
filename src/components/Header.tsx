@@ -128,6 +128,9 @@ const Header: React.FC<HeaderProps> = ({
             onInput={(event: React.ChangeEvent<HTMLInputElement>) => {
               setUsername(event.target.value);
             }}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") handleSearch();
+            }}
           />
           <img
             src={`${searchLoadingStatusTrue ? "./loading.gif" : "./lupa.svg"}`}
