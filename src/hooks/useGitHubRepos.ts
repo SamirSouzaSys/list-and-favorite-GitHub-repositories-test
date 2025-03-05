@@ -29,7 +29,48 @@ export function usePaginateGHProfileRepos() {
   const [loadingSearch, setLoadingSearch] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchGithubData = async (username = user?.login, reset = false, ) => {
+  // Search User
+  const fetchUser = async (username: string) => {
+    const userResponse = await fetch(
+      `${import.meta.env.VITE_GITHUB_API_URL}/users/${username}`,
+      headerModel
+    );
+    if (!userResponse.ok) throw new Error("Usuário não encontrado");
+    return await userResponse.json();
+  };
+
+  // Search Repositories
+  const fetchRepositories = async (username: string, currentPage: number) => {
+    const reposResponse = await fetch(
+      `${import.meta.env.VITE_GITHUB_API_URL}/users/${username}/repos?page=${currentPage}&per_page=${perPage}`,
+      headerModel
+    );
+    if (!reposResponse.ok) throw new Error("Erro ao buscar repositórios");
+    return await reposResponse.json();
+  };
+
+  // Search Languages of each repositorie
+  const fetchLanguagesForRepos = async (reposData: Repository[], username: string) => {
+    return await Promise.all(
+      reposData.map(async (repo: Repository) => {
+        const languagesResponse = await fetch(
+          `${import.meta.env.VITE_GITHUB_API_URL}/repos/${username}/${repo.name}/languages`,
+          headerModel
+        );
+        const languagesData: RepositoryLanguages = await languagesResponse.json();
+        return {
+          name: repo.name,
+          description: repo.description,
+          languages: languagesData,
+          updated_at: repo.updated_at,
+          id: repo.id,
+        } as Repository;
+      })
+    );
+  };
+
+  // Main function - search all data
+  const fetchGithubData = async (username = user?.login, reset = false) => {
     if (username && !username.trim()) return;
 
     setLoadingSearch(true);
@@ -41,49 +82,15 @@ export function usePaginateGHProfileRepos() {
       if (reset) resetSearch();
 
       // Search User
-      const userResponse = await fetch(
-        `${import.meta.env.VITE_GITHUB_API_URL}/users/${username}`,
-        headerModel
-      );
-
-      if (!userResponse.ok) throw new Error("Usuário não encontrado");
-
-      const userData = await userResponse.json();
+      const userData = await fetchUser(username);
 
       // Search Repositories
-      const reposResponse = await fetch(
-        `${
-          import.meta.env.VITE_GITHUB_API_URL
-        }/users/${username}/repos?page=${currentPage}&per_page=${perPage}`,
-        headerModel
-      );
-
-      if (!reposResponse.ok) throw new Error("Erro ao buscar repositórios");
-      const reposData = await reposResponse.json();
+      const reposData = await fetchRepositories(username, currentPage);
 
       // Search Languages of each repositorie
-      const reposWithLanguages = await Promise.all(
-        reposData.map(async (repo: Repository) => {
-          const languagesResponse = await fetch(
-            `${import.meta.env.VITE_GITHUB_API_URL}/repos/${username}/${
-              repo.name
-            }/languages`,
-            headerModel
-          );
-          const languagesData: RepositoryLanguages =
-            await languagesResponse.json();
+      const reposWithLanguages = await fetchLanguagesForRepos(reposData, username);
 
-          return {
-            name: repo.name,
-            description: repo.description,
-            languages: languagesData,
-            updated_at: repo.updated_at,
-            id: repo.id,
-          } as Repository;
-        })
-      );
-
-      // Update User
+      // Update User - repositories and languages
       setUser((prevUser: GithubUser | null): GithubUser => {
         const updateRepositories = reset
           ? reposWithLanguages
