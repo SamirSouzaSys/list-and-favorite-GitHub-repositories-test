@@ -37,6 +37,12 @@ OK - Commits padronizados
 
 Desenvolver seguinte o layout [protótipo](https://www.figma.com/file/NPsgIQuNZEv46Jy9u1d90E/Processo-Seletivo?node-id=0%3A1).
 
+## Como configurar o projeto para funcionar
+
+- Você deve gerar uma cópia do arquivo .env.example renomeando-o para ".env"
+  - Neste arquivo adicione um token do git na propriedade VITE_GITHUB_TOKEN= "Seu token aqui"
+  - Você pode usar o token fornecido no email ou gerar um novo token no sitet do github (seguem instruções mais adiante neste mesmo arquivo)
+
 ## Sobre a entrega
 
 - A API do GitHub requer uma autenticação. Você deverá gerar um token de acesso pessoal no seu GitHub e utilizá-lo no projeto.
