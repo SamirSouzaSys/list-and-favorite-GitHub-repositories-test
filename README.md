@@ -1,50 +1,56 @@
-# React + TypeScript + Vite
+### Samir Souza - Teste técnico - Front end - Casar.com
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# Lista de repositórios do GitHub
 
-Currently, two official plugins are available:
+## Descrição
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Nesse projeto você deverá desenvolver um site simples em que seja possível acessar a página de um usuário e visualizar seus repositórios públicos, além de poder favoritar/remover repositórios dos favoritos.
 
-## Expanding the ESLint configuration
+## Requisitos
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- [ OK ] Uma barra de pesquisa para procurar um usuário
+- [ OK ] Um feedback caso o usuário não seja encontrado
+- [ OK ] Uma página do usuário, mostrando suas informações e sua lista de repositórios
+- [ OK ] Possibilidade de favoritar e remover repositórios dos favoritos (fazer persistência dos dados)
+- [ OK ] Listar repositórios favoritos
+- [ OK ] **NÃO OBRIGATÓRIO** A lista de repositórios deverá conter uma paginação com rolagem infinita, ou seja, mais repositórios serão carregados conforme o usuário rola a página para baixo até que não haja mais repositórios (estilo Facebook, Instagram, Twitter, etc.)
 
-- Configure the top-level `parserOptions` property like this:
+## Obrigatório
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+- [ OK - React ] Utilização de um framework/lib dentre esses: (Vue 3, Nuxt 3, React ou Next)
+- [ OK ] Typescript
+- [ - ] Testes unitários (Jest ou Vitest), o máximo de cobertura que conseguir, mas no mínimo uma funcionalidade, por exemplo: (Listagem de repositórios)
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+Observação: A estrutura de testes foi inicializada usando Jest e MSW para mockar os dados. Estou resolvendo dificuldades com o funcionamento dos testes, exemplo: Os testes não estão consumindo os dados do .env. Estou trabalhando nisso.
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+**Sinta-se livre para adicionar qualquer outra tecnologia, desde que utilize as tecnologias obrigatórias.**
+- ContextAPI
+- MSW - mocks para os testes e para um ambiente de desenvolvimento sem acesso a internet, usando somente os mocks como dados.
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+## Diferenciais
+
+OK - Tailwindcss
+OK - Commits padronizados
+- Nextjs com SSR ou SSG
+
+## Layout
+
+Desenvolver seguinte o layout [protótipo](https://www.figma.com/file/NPsgIQuNZEv46Jy9u1d90E/Processo-Seletivo?node-id=0%3A1).
+
+## Sobre a entrega
+
+- A API do GitHub requer uma autenticação. Você deverá gerar um token de acesso pessoal no seu GitHub e utilizá-lo no projeto.
+
+Caso não queira deixar o seu token visível em seu repositório, disponibilize um guia em seu **README** sobre onde substituir o token.
+
+Para mais detalhes sobre como gerar um token, acesse o [guia de autenticação do GitHub](https://docs.github.com/pt/rest/authentication/authenticating-to-the-rest-api?apiVersion=2022-11-28).
+
+
+- Envie o link do seu repositório para **tech@casar.com**
+    - Título do e-mail: Teste técnico - Samir José Lopes Souza {Seu nome completo}
+    - Corpo do e-mail: Link do repositório
+    - Opcional: Cover letter
+
+## Links
+
+[Documentação da API do GitHub](https://docs.github.com/pt/rest?apiVersion=2022-11-28)
